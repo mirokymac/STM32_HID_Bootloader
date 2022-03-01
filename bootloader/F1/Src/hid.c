@@ -75,11 +75,7 @@ volatile bool UploadStarted;
 volatile bool UploadFinished;
 
 /* Sent command (Received command is the same minus last byte) */
-#if PAGE_SIZE == 1024
 static const uint8_t Command[] = {'B', 'T', 'L', 'D', 'C', 'M', 'D', 2};
-#else
-static const uint8_t Command[] = {'B', 'T', 'L', 'D', 'C', 'M', 'D', 3};
-#endif
 
 /* Flash page buffer */
 static uint8_t PageData[PAGE_SIZE];
@@ -178,10 +174,11 @@ static const uint8_t USB_VendorStringDescriptor[] = {
 };
 
 static const uint8_t USB_ProductStringDescriptor[] = {
-	0x1E,			// bLength
+	0x2C,			// bLength
 	0x03,			// bDescriptorType (String)
-	'H', 0, 'I', 0, 'D', 0, ' ', 0, 'B', 0, 'o', 0, 'o', 0, 't', 0, 'l', 0,
-	'o', 0, 'a', 0, 'd', 0, 'e', 0, 'r', 0
+	'S', 0, 'T', 0, 'M', 0, '3', 0, '2', 0, 'F', 0, ' ', 0, 'H', 0, 'I', 0,
+	'D', 0, ' ', 0, 'B', 0, 'o', 0, 'o', 0, 't', 0, 'l', 0, 'o', 0, 'a', 0,
+	'd', 0, 'e', 0, 'r', 0
 };
 
 static void HIDUSB_GetDescriptor(USB_SetupPacket *setup_packet)
@@ -289,7 +286,7 @@ static void HIDUSB_HandleData(uint8_t *data)
 		CurrentPageOffset = 0;
 		LED1_OFF;
 	}
-
+  
   if((CurrentPageOffset == 0)||(CurrentPageOffset == 1024)){
     USB_SendData(ENDP1, (uint16_t *) Command,
 			sizeof (Command));

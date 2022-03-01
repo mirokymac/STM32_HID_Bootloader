@@ -6,7 +6,7 @@ VECTOR_TABLE_OFFSET = 0x0000
 
 # The default Flash Page size (Sector size) for LOW and MEDIUM STM32F103 devices is 1024 bytes
 # High Density STM32F103 devices have 2 kB Flash Page size  
-PAGE_SIZE = 1024
+PAGE_SIZE = 1024 
 
 C_SRCS = Src/main.c Src/usb.c Src/hid.c Src/led.c Src/flash.c
 
@@ -57,7 +57,7 @@ GDB = $(PREFIX)gdb
 
 ECHO = @echo
 CP = cp
-MKDIR = mkdir
+MKDIR = mkdir -p
 RM = rm
 RMDIR = rmdir
 
@@ -83,10 +83,8 @@ generic-pb7: $(SRCS) clean gccversion build_generic-pb7 copy_generic-pb7 info si
 generic-pb0: $(SRCS) clean gccversion build_generic-pb0 copy_generic-pb0 info size
 generic-pb12: $(SRCS) clean gccversion build_generic-pb12 copy_generic-pb12 info size
 mini-stm32v3: $(SRCS) clean gccversion build_mini-stm32v3 copy_mini-stm32v3 info size
-btt-skr-mini-e3: $(SRCS) clean gccversion build_btt-skr-mini-e3 copy_btt-skr-mini-e3 info size
-btt-skr-mini-e3_no-btn: $(SRCS) clean gccversion build_btt-skr-mini-e3_no-btn copy_btt-skr-mini-e3_no-btn info size
-btt-skr-mini-e3-2point0: $(SRCS) clean gccversion build_btt-skr-mini-e3-2point0 copy_btt-skr-mini-e3-2point0 info size
-btt-skr-mini-e3-2point0_no-btn: $(SRCS) clean gccversion build_btt-skr-mini-e3-2point0_no-btn copy_btt-skr-mini-e3-2point0_no-btn info size
+
+generic-pc13_ld: $(SRCS) clean gccversion build_generic-pc13_ld copy_generic-pc13_ld info size
 
 build_maple-mini: TARGETFLAGS= -DTARGET_MAPLE_MINI
 build_maple-mini: LINKER_SCRIPT=STM32F103C8T6.ld
@@ -179,34 +177,13 @@ copy_mini-stm32v3: $(BIN_DIR)
 	$(ECHO) "COPY    $(BIN_DIR)/hid_mini-stm32v3.bin"
 	$(Q)$(CP) $(BUILD_DIR)/$(TARGET).bin $(BIN_DIR)/hid_mini-stm32v3.bin
 
-build_btt-skr-mini-e3 : TARGETFLAGS= -DTARGET_BTT_SKR_MINI_E3 -DENABLE_BUTTON
-build_btt-skr-mini-e3 : LINKER_SCRIPT=STM32F103C8T6.ld
-build_btt-skr-mini-e3 : $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).bin
-copy_btt-skr-mini-e3: $(BIN_DIR)
-	$(ECHO) "COPY    $(BIN_DIR)/hid_btt_skr_mini_e3.bin"
-	$(Q)$(CP) $(BUILD_DIR)/$(TARGET).bin $(BIN_DIR)/hid_btt_skr_mini_e3.bin
-
-build_btt-skr-mini-e3_no-btn : TARGETFLAGS= -DTARGET_BTT_SKR_MINI_E3
-build_btt-skr-mini-e3_no-btn : LINKER_SCRIPT=STM32F103C8T6.ld
-build_btt-skr-mini-e3_no-btn : $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).bin
-copy_btt-skr-mini-e3_no-btn: $(BIN_DIR)
-	$(ECHO) "COPY    $(BIN_DIR)/hid_btt_skr_mini_e3_no_btn.bin"
-	$(Q)$(CP) $(BUILD_DIR)/$(TARGET).bin $(BIN_DIR)/hid_btt_skr_mini_e3_no_btn.bin
-
-build_btt-skr-mini-e3-2point0 : TARGETFLAGS= -DTARGET_BTT_SKR_MINI_E3_2POINT0 -DENABLE_BUTTON
-build_btt-skr-mini-e3-2point0 : LINKER_SCRIPT=STM32F103C8T6.ld
-build_btt-skr-mini-e3-2point0 : $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).bin
-copy_btt-skr-mini-e3-2point0: $(BIN_DIR)
-	$(ECHO) "COPY    $(BIN_DIR)/hid_btt_skr_mini_e3_2point0.bin"
-	$(Q)$(CP) $(BUILD_DIR)/$(TARGET).bin $(BIN_DIR)/hid_btt_skr_mini_e3_2point0.bin
-
-build_btt-skr-mini-e3-2point0_no-btn : TARGETFLAGS= -DTARGET_BTT_SKR_MINI_E3_2POINT0
-build_btt-skr-mini-e3-2point0_no-btn : LINKER_SCRIPT=STM32F103C8T6.ld
-build_btt-skr-mini-e3-2point0_no-btn : $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).bin
-copy_btt-skr-mini-e3-2point0_no-btn: $(BIN_DIR)
-	$(ECHO) "COPY    $(BIN_DIR)/hid_btt_skr_mini_e3_2point0_no_btn.bin"
-	$(Q)$(CP) $(BUILD_DIR)/$(TARGET).bin $(BIN_DIR)/hid_btt_skr_mini_e3_2point0_no_btn.bin
-
+build_generic-pc13_ld: TARGETFLAGS= -DTARGET_GENERIC_F103_PC13_LD
+build_generic-pc13_ld: LINKER_SCRIPT=STM32F103C6T6.ld
+build_generic-pc13_ld: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).bin
+copy_generic-pc13_ld: $(BIN_DIR)
+	$(ECHO) "COPY    $(BIN_DIR)/hid_generic_pc13_ld.bin"
+	$(Q)$(CP) $(BUILD_DIR)/$(TARGET).bin $(BIN_DIR)/hid_generic_pc13_ld.bin
+  
 $(BUILD_DIR)/$(TARGET).elf: $(OBJS)
 	$(ECHO) "LD      $@"
 	$(Q)$(CC) $(LDFLAGS) $(CFLAGS) $(OBJS) -o "$@"

@@ -36,7 +36,11 @@
 #define BOOTLOADER_SIZE			(2 * 1024)
 
 /* SRAM size */
-#define SRAM_SIZE			(20 * 1024)
+#ifndef TARGET_GENERIC_F103_PC13_LD
+	#define SRAM_SIZE			(20 * 1024)
+#else
+	#define SRAM_SIZE			(10 * 1024)
+#endif
 
 /* SRAM end (bottom of stack) */
 #define SRAM_END			(SRAM_BASE + SRAM_SIZE)
@@ -199,23 +203,24 @@ void Reset_Handler(void)
 	 *    registers from the Arduino IDE
 	 * then enter HID bootloader...
 	 */
-	if ((magic_word == 0x424C) || CHECK_BOOT ||
+	if ((magic_word == 0x424C) ||
+		READ_BIT(GPIOB->IDR, GPIO_IDR_IDR2) ||
 		(check_user_code(USER_PROGRAM) == false)) {
+		if (magic_word == 0x424C) {
 
-		// It shouldn't be necessary to check for the
-		// magic word to execute the below code block.
-		// In fact the USB reset is necessary on blue
-		// pill devices.
-		LED2_ON;
-		USB_Shutdown();
-		delay(4000000L);
-
+			/* If a magic word was stored in the
+			 * battery-backed RAM registers from the
+			 * Arduino IDE, exit from USB Serial mode and
+			 * go to HID mode...
+			 */
+			LED2_ON;
+			USB_Shutdown();
+			delay(4000000L);
+		}
 		USB_Init();
 		while (check_flash_complete() == false) {
 			delay(400L);
 		};
-
-		delay(200000L);
 
 		/* Reset the USB */
 		USB_Shutdown();
@@ -232,7 +237,7 @@ void Reset_Handler(void)
 
 	/* Turn GPIO clocks off */
 	CLEAR_BIT(RCC->APB2ENR,
-		LED1_CLOCK | LED2_CLOCK | DISC_CLOCK | AFIO_CLOCK/* | RCC_APB2ENR_IOPBEN*/);
+		LED1_CLOCK | LED2_CLOCK | DISC_CLOCK/* | RCC_APB2ENR_IOPBEN*/);
 
 	/* Setup the vector table to the final user-defined one in Flash
 	 * memory
